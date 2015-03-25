@@ -379,16 +379,16 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
 
           float cell_probability;
           float cell_texture;
+          unsigned int obs = 0;
 
           OctreeVoxelColorMode octree_color_mode = static_cast<OctreeVoxelColorMode>(octree_coloring_property_->getOptionInt());
 
           switch (octree_color_mode)
           {
-            case OCTOMAP_PROBABLILTY_COLOR:
-              unsigned int obs = 0;
+            case OCTOMAP_TEXTURE_COLOR:
               for (auto i=0; i<6; ++i) {
-                cell_texture += (it->getFaceValue((FaceEnum) i) * it->getFaceObservations((FaceEnum) i));
-                obs += it->getFaceObservations((FaceEnum) i);
+                cell_texture += (it->getFaceValue((octomap::FaceEnum) i) * it->getFaceObservations((octomap::FaceEnum) i));
+                obs += it->getFaceObservations((octomap::FaceEnum) i);
               }
               cell_texture /= obs;
               newPoint.setColor(cell_texture, cell_texture, cell_texture);
