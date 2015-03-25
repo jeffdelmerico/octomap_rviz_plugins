@@ -14,5 +14,12 @@
       Displays projected 2D occupancy maps generated from compressed octomap messages.
     </description>
   </class>
+  <class name="octomap_rviz_plugin/TextureGrid"
+         type="octomap_rviz_plugin::TextureGridDisplay"
+         base_class_type="rviz::Display">
+    <description>
+      Displays 3D grids with face textures generated from compressed octomap messages.
+    </description>
+  </class>
 </library>
   
