@@ -274,7 +274,7 @@ void OccupancyGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCo
   ++messages_received_;
   setStatus(StatusProperty::Ok, "Messages", QString::number(messages_received_) + " octomap messages received");
 
-  ROS_DEBUG("Received OctomapBinary message (size: %d bytes)", (int)msg->data.size());
+  ROS_DEBUG("Received message (size: %d bytes)", (int)msg->data.size());
 
   // get tf transform
   Ogre::Vector3 pos;

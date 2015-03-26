@@ -88,6 +88,7 @@ protected:
   void incomingMessageCallback(const octomap_msgs::OctomapConstPtr& msg);
 
   void setColor( double z_pos, double min_z, double max_z, double color_factor, rviz::PointCloud::Point& point);
+  void setIntensity( double intensity, rviz::PointCloud::Point& point);
 
   void clear();
 

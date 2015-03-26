@@ -271,12 +271,20 @@ void TextureGridDisplay::setColor(double z_pos, double min_z, double max_z, doub
   }
 }
 
+void TextureGridDisplay::setIntensity( double intensity, rviz::PointCloud::Point& point)
+{
+  // intensity should already be between 0.0 and 1.0, but enforce this
+  double i = std::max(0.0, std::min(1.0, intensity)); 
+  point.setColor(i,i,i);
+}
+
 void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapConstPtr& msg)
 {
   ++messages_received_;
   setStatus(StatusProperty::Ok, "Messages", QString::number(messages_received_) + " octomap messages received");
 
   ROS_DEBUG("Received OctomapBinary message (size: %d bytes)", (int)msg->data.size());
+  ROS_INFO("Received octomap of type: %s", msg->id.c_str());
 
   // get tf transform
   Ogre::Vector3 pos;
@@ -297,7 +305,9 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
   octomap::TextureOcTree* octomap = NULL;
   octomap::AbstractOcTree* tree = octomap_msgs::msgToMap(*msg);
   if (tree)
+  {
     octomap = dynamic_cast<octomap::TextureOcTree*>(tree);
+  }
 
   if (!octomap)
   {
@@ -387,11 +397,15 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
           {
             case OCTOMAP_TEXTURE_COLOR:
               for (auto i=0; i<6; ++i) {
-                cell_texture += (it->getFaceValue((octomap::FaceEnum) i) * it->getFaceObservations((octomap::FaceEnum) i));
+                cell_texture += (float) (it->getFaceValue((octomap::FaceEnum) i) * it->getFaceObservations((octomap::FaceEnum) i));
                 obs += it->getFaceObservations((octomap::FaceEnum) i);
               }
-              cell_texture /= obs;
-              newPoint.setColor(cell_texture, cell_texture, cell_texture);
+              if(obs < 1)
+                cell_texture = 0.0;
+              else
+                cell_texture /= (obs*255.0);
+              setIntensity(cell_texture, newPoint);
+              //newPoint.setColor(cell_texture, cell_texture, cell_texture);
               break;
             case OCTOMAP_Z_AXIS_COLOR:
               setColor(newPoint.position.z, minZ, maxZ, color_factor_, newPoint);
