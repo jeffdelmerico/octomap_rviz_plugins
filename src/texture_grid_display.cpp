@@ -283,8 +283,7 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
   ++messages_received_;
   setStatus(StatusProperty::Ok, "Messages", QString::number(messages_received_) + " octomap messages received");
 
-  ROS_DEBUG("Received OctomapBinary message (size: %d bytes)", (int)msg->data.size());
-  ROS_INFO("Received octomap of type: %s", msg->id.c_str());
+  ROS_DEBUG("Received Octomap message (size: %d bytes)", (int)msg->data.size());
 
   // get tf transform
   Ogre::Vector3 pos;
