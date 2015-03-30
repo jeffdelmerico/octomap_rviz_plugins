@@ -66,6 +66,7 @@ enum OctreeVoxelRenderMode
 
 enum OctreeVoxelColorMode
 {
+  OCTOMAP_TEXTURE_GRAYSCALE,
   OCTOMAP_TEXTURE_COLOR,
   OCTOMAP_Z_AXIS_COLOR,
   OCTOMAP_PROBABLILTY_COLOR,
@@ -105,12 +106,13 @@ TextureGridDisplay::TextureGridDisplay() :
   octree_render_property_->addOption( "Free Voxels",  OCTOMAP_FREE_VOXELS );
   octree_render_property_->addOption( "All Voxels",  OCTOMAP_FREE_VOXELS | OCTOMAP_OCCUPIED_VOXELS);
 
-  octree_coloring_property_ = new rviz::EnumProperty( "Voxel Coloring", "Texture",
+  octree_coloring_property_ = new rviz::EnumProperty( "Voxel Coloring", "Texture - Grayscale",
                                                 "Select voxel coloring mode",
                                                 this,
                                                 SLOT( updateOctreeColorMode() ) );
 
-  octree_coloring_property_->addOption( "Texture",  OCTOMAP_TEXTURE_COLOR );
+  octree_coloring_property_->addOption( "Texture - Grayscale",  OCTOMAP_TEXTURE_GRAYSCALE );
+  octree_coloring_property_->addOption( "Texture - Color",  OCTOMAP_TEXTURE_COLOR );
   octree_coloring_property_->addOption( "Z-Axis",  OCTOMAP_Z_AXIS_COLOR );
   octree_coloring_property_->addOption( "Cell Probability",  OCTOMAP_PROBABLILTY_COLOR );
 
@@ -394,7 +396,7 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
 
           switch (octree_color_mode)
           {
-            case OCTOMAP_TEXTURE_COLOR:
+            case OCTOMAP_TEXTURE_GRAYSCALE:
               for (auto i=0; i<6; ++i) {
                 cell_texture += (float) (it->getFaceValue((octomap::FaceEnum) i) * it->getFaceObservations((octomap::FaceEnum) i));
                 obs += it->getFaceObservations((octomap::FaceEnum) i);
@@ -405,6 +407,17 @@ void TextureGridDisplay::incomingMessageCallback(const octomap_msgs::OctomapCons
                 cell_texture /= (obs*255.0);
               setIntensity(cell_texture, newPoint);
               //newPoint.setColor(cell_texture, cell_texture, cell_texture);
+              break;
+            case OCTOMAP_TEXTURE_COLOR:
+              for (auto i=0; i<6; ++i) {
+                cell_texture += (float) (it->getFaceValue((octomap::FaceEnum) i) * it->getFaceObservations((octomap::FaceEnum) i));
+                obs += it->getFaceObservations((octomap::FaceEnum) i);
+              }
+              if(obs < 1)
+                cell_texture = 0.0;
+              else
+                cell_texture /= (obs*255.0);
+              setColor(cell_texture, 0.0, 1.0, color_factor_, newPoint);
               break;
             case OCTOMAP_Z_AXIS_COLOR:
               setColor(newPoint.position.z, minZ, maxZ, color_factor_, newPoint);
